@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For You</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000;
+        }
+        
+        .video-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            opacity: 0.7;
+        }
+        
+        .video-box {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            z-index: 1;
+        }
+        
+        .center-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: white;
+        }
+        
+        .photo-frame {
+            width: 300px;
+            height: 285px;
+            border-radius: 50%;
+            border: 8px solid rgba(255, 255, 255, 0.7);
+            overflow: hidden;
+            margin: 0 auto 40px;
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.5);
+            transition: transform 0.3s ease;
+        }
+        
+        .photo-frame:hover {
+            transform: scale(0.2);
+        }
+        
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+           
+
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 30 auto;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+    
+    <div class="video-container">
+        <!-- Video Grid: 9 videos playing in background -->
+        <div class="video-box">
+            <video autoplay muted loop>
+                <source src="myvideo1.mp4" type="video/mp4">
+            </video>
+        </div>
+        <div class="video-box">
+            <video autoplay muted loop>
+                <source src="myvideo1.mp4" type="video/mp4">
+            </video>
+        </div>
+        <div class="video-box">
+            <video autoplay muted loop>
+                <source src="myvideo1.mp4" type="video/mp4">
+            </video>
+        </div>
+        <div class="video-box">
+            <video autoplay muted loop>
+                <source src="myvideo1.mp4" type="video/mp4">
+            </video>
+        </div>
+        <div class="video-box">
+            <video autoplay muted loop>
+                <source src="myvideo1.mp4" type="video/mp4">
+            </video>
+        </div>
+        <div class="video-box">
+            <video autoplay muted loop>
+                <source src="myvideo1.mp4" type="video/mp4">
+            </video>
+        </div>
+        <div class="video-box">
+            <video autoplay muted loop>
+                <source src="myvideo1.mp4" type="video/mp4">
+            </video>
+        </div>
+        <div class="video-box">
+            <video autoplay muted loop>
+                <source src="my_video.mp4" type="video/mp4">
+            </video>
+        </div>
+        <div class="video-box">
+            <video autoplay muted loop>
+                <source src="myvideo1.mp4" type="video/mp4">
+            </video>
+        </div>
+    </div>
+    
+    <div class="center-content">
+        <div class="photo-frame">
+            <img src="myphoto.jpg" alt="Your Photo">
+        </div>
+        <h1>For You</h1>
+        <p>you're mine a my little firdaous.</p>
+    </div>
+
+    <script>
+        // You can add any additional JavaScript here
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded successfully!');
+        });
+    </script>
+</body>
+</html>
