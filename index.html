@@ -125,6 +125,39 @@
             to { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
+        /* Audio controls styling */
+        .audio-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 8px 12px;
+            border-radius: 20px;
+            color: white;
+        }
+
+        .audio-controls button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+
+        .audio-controls .volume-slider {
+            width: 60px;
+            margin-left: 10px;
+        }
+
         /* Add responsive styles for smaller screens */
         @media (max-width: 768px) {
             .photo-frame {
@@ -139,6 +172,12 @@
             p {
                 font-size: 1rem;
             }
+
+            .audio-controls {
+                bottom: 10px;
+                right: 10px;
+                padding: 6px 10px;
+            }
         }
     </style>
 </head>
@@ -149,12 +188,12 @@
     <div class="video-container" id="videoContainer">
         <!-- Video Grid: 9 videos playing in background -->
         <div class="video-box">
-            <video autoplay muted loop playsinline preload="auto" data-src="myvideo1.mp4">
+            <video autoplay muted loop playsinline preload="auto" data-src="myvideo2.mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
         <div class="video-box">
-            <video autoplay muted loop playsinline preload="auto" data-src="myvideo1.mp4">
+            <video autoplay muted loop playsinline preload="auto" data-src="myvideo3.mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
@@ -203,6 +242,20 @@
         <p>you're mine a my little firdaous.</p>
     </div>
 
+    <!-- Background music -->
+    <audio id="backgroundMusic" loop>
+        <source src="mysong.mp3" type="audio/mp3">
+        <source src="mysong.ogg" type="audio/ogg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <!-- Audio controls -->
+    <div class="audio-controls">
+        <button id="playPauseBtn">▶</button>
+        <span>Music</span>
+        <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.1" value="0.7">
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Page loaded successfully!');
@@ -214,6 +267,36 @@
             const videoCount = videoElements.length;
             let loadedCount = 0;
             let allVideosStarted = false;
+            
+            // Audio elements
+            const backgroundMusic = document.getElementById('backgroundMusic');
+            const playPauseBtn = document.getElementById('playPauseBtn');
+            const volumeSlider = document.getElementById('volumeSlider');
+            let musicPlaying = false;
+            
+            // Set initial volume
+            backgroundMusic.volume = volumeSlider.value;
+            
+            // Handle play/pause button
+            playPauseBtn.addEventListener('click', function() {
+                if (musicPlaying) {
+                    backgroundMusic.pause();
+                    playPauseBtn.innerHTML = '▶';
+                    musicPlaying = false;
+                } else {
+                    backgroundMusic.play().catch(e => {
+                        console.log('Music autoplay prevented:', e);
+                        // We'll try to start it with user interaction
+                    });
+                    playPauseBtn.innerHTML = '❚❚';
+                    musicPlaying = true;
+                }
+            });
+            
+            // Handle volume changes
+            volumeSlider.addEventListener('input', function() {
+                backgroundMusic.volume = this.value;
+            });
             
             // Preload all videos first
             videoElements.forEach(function(video) {
@@ -268,6 +351,20 @@
                         });
                     }
                 });
+                
+                // Try to start the music automatically
+                startBackgroundMusic();
+            }
+            
+            // Function to start background music
+            function startBackgroundMusic() {
+                backgroundMusic.play().then(function() {
+                    playPauseBtn.innerHTML = '❚❚';
+                    musicPlaying = true;
+                }).catch(function(error) {
+                    console.log('Music autoplay prevented:', error);
+                    // We'll start it on user interaction
+                });
             }
             
             // Add a trigger for user interaction if needed
@@ -278,6 +375,7 @@
                     const interactionEvents = ['click', 'touchstart', 'keydown'];
                     interactionEvents.forEach(function(event) {
                         document.addEventListener(event, function() {
+                            // Start videos
                             videoElements.forEach(function(video) {
                                 if (video.paused) {
                                     video.play().then(function() {
@@ -287,6 +385,11 @@
                                     });
                                 }
                             });
+                            
+                            // Start music
+                            if (!musicPlaying) {
+                                startBackgroundMusic();
+                            }
                         }, {once: true});
                     });
                     
