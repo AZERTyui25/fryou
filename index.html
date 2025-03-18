@@ -46,6 +46,12 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        video.loaded {
+            opacity: 1;
         }
         
         .overlay {
@@ -99,6 +105,26 @@
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
 
+        /* Spinner for loading state */
+        .loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 48px;
+            height: 48px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            z-index: 3;
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
         /* Add responsive styles for smaller screens */
         @media (max-width: 768px) {
             .photo-frame {
@@ -118,69 +144,52 @@
 </head>
 <body>
     <div class="overlay"></div>
+    <div class="loader" id="loader"></div>
     
     <div class="video-container" id="videoContainer">
         <!-- Video Grid: 9 videos playing in background -->
         <div class="video-box">
-            <video autoplay muted loop playsinline preload="auto">
-                <source src="myvideo1.mp4" type="video/mp4">
-                <source src="myvideo1.webm" type="video/webm">
+            <video autoplay muted loop playsinline preload="auto" data-src="myvideo1.mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
         <div class="video-box">
-            <video autoplay muted loop playsinline preload="auto">
-                <source src="myvideo1.mp4" type="video/mp4">
-                <source src="myvideo1.webm" type="video/webm">
+            <video autoplay muted loop playsinline preload="auto" data-src="myvideo1.mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
         <div class="video-box">
-            <video autoplay muted loop playsinline preload="auto">
-                <source src="myvideo1.mp4" type="video/mp4">
-                <source src="myvideo1.webm" type="video/webm">
+            <video autoplay muted loop playsinline preload="auto" data-src="myvideo1.mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
         <div class="video-box">
-            <video autoplay muted loop playsinline preload="auto">
-                <source src="myvideo1.mp4" type="video/mp4">
-                <source src="myvideo1.webm" type="video/webm">
+            <video autoplay muted loop playsinline preload="auto" data-src="myvideo1.mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
         <div class="video-box">
-            <video autoplay muted loop playsinline preload="auto">
-                <source src="myvideo1.mp4" type="video/mp4">
-                <source src="myvideo1.webm" type="video/webm">
+            <video autoplay muted loop playsinline preload="auto" data-src="myvideo1.mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
         <div class="video-box">
-            <video autoplay muted loop playsinline preload="auto">
-                <source src="myvideo1.mp4" type="video/mp4">
-                <source src="myvideo1.webm" type="video/webm">
+            <video autoplay muted loop playsinline preload="auto" data-src="myvideo1.mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
         <div class="video-box">
-            <video autoplay muted loop playsinline preload="auto">
-                <source src="myvideo1.mp4" type="video/mp4">
-                <source src="myvideo1.webm" type="video/webm">
+            <video autoplay muted loop playsinline preload="auto" data-src="myvideo1.mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
         <div class="video-box">
-            <video autoplay muted loop playsinline preload="auto">
-                <source src="myvideo1.mp4" type="video/mp4">
-                <source src="myvideo1.webm" type="video/webm">
+            <video autoplay muted loop playsinline preload="auto" data-src="myvideo1.mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
         <div class="video-box">
-            <video autoplay muted loop playsinline preload="auto">
-                <source src="myvideo1.mp4" type="video/mp4">
-                <source src="myvideo1.webm" type="video/webm">
+            <video autoplay muted loop playsinline preload="auto" data-src="myvideo1.mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
@@ -198,31 +207,111 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Page loaded successfully!');
             
-            // Force video playback on mobile with user interaction
-            document.body.addEventListener('touchstart', function() {
-                const videos = document.querySelectorAll('video');
-                videos.forEach(function(video) {
-                    video.play().catch(function(error) {
-                        console.log('Error playing video:', error);
-                    });
-                });
-            }, {once: true});
+            const loader = document.getElementById('loader');
+            loader.style.display = 'block';
             
-            // Check if videos are playing and handle errors
-            const videos = document.querySelectorAll('video');
-            videos.forEach(function(video) {
-                video.addEventListener('error', function() {
-                    console.error('Video error:', this.error);
-                    this.parentNode.classList.add('video-error');
+            const videoElements = document.querySelectorAll('video');
+            const videoCount = videoElements.length;
+            let loadedCount = 0;
+            let allVideosStarted = false;
+            
+            // Preload all videos first
+            videoElements.forEach(function(video) {
+                // Set the source
+                const src = video.getAttribute('data-src');
+                video.innerHTML = `<source src="${src}" type="video/mp4">`;
+                
+                // Wait for the video to be loaded
+                video.addEventListener('loadeddata', function() {
+                    loadedCount++;
+                    
+                    // If all videos are loaded, start them together
+                    if (loadedCount === videoCount && !allVideosStarted) {
+                        startAllVideos();
+                    }
                 });
                 
-                // Attempt to play videos when they load
-                video.addEventListener('loadeddata', function() {
-                    video.play().catch(function(error) {
-                        console.log('Autoplay prevented:', error);
-                    });
+                // Error handling
+                video.addEventListener('error', function() {
+                    console.error('Video error:', this.error);
+                    loadedCount++;
+                    
+                    // Even if there's an error, try to start the other videos
+                    if (loadedCount === videoCount && !allVideosStarted) {
+                        startAllVideos();
+                    }
                 });
+                
+                // Force load the video
+                video.load();
             });
+            
+            // Function to start all videos simultaneously
+            function startAllVideos() {
+                allVideosStarted = true;
+                loader.style.display = 'none';
+                
+                videoElements.forEach(function(video) {
+                    video.currentTime = 0; // Reset to beginning
+                    
+                    // Try to play the video
+                    const playPromise = video.play();
+                    
+                    if (playPromise !== undefined) {
+                        playPromise.then(function() {
+                            // Video playback started successfully
+                            video.classList.add('loaded');
+                        }).catch(function(error) {
+                            console.log('Autoplay prevented:', error);
+                            // Add user interaction to trigger playback
+                            addUserInteractionTrigger();
+                        });
+                    }
+                });
+            }
+            
+            // Add a trigger for user interaction if needed
+            function addUserInteractionTrigger() {
+                if (!document.hasInteractionListener) {
+                    document.hasInteractionListener = true;
+                    
+                    const interactionEvents = ['click', 'touchstart', 'keydown'];
+                    interactionEvents.forEach(function(event) {
+                        document.addEventListener(event, function() {
+                            videoElements.forEach(function(video) {
+                                if (video.paused) {
+                                    video.play().then(function() {
+                                        video.classList.add('loaded');
+                                    }).catch(function(error) {
+                                        console.log('Play error:', error);
+                                    });
+                                }
+                            });
+                        }, {once: true});
+                    });
+                    
+                    // Add a message to tap/click to start videos
+                    const tapMessage = document.createElement('div');
+                    tapMessage.textContent = 'Tap anywhere to start';
+                    tapMessage.style.position = 'fixed';
+                    tapMessage.style.top = '20px';
+                    tapMessage.style.left = '0';
+                    tapMessage.style.right = '0';
+                    tapMessage.style.textAlign = 'center';
+                    tapMessage.style.color = 'white';
+                    tapMessage.style.fontSize = '16px';
+                    tapMessage.style.zIndex = '5';
+                    document.body.appendChild(tapMessage);
+                }
+            }
+            
+            // Set a timeout in case videos take too long to load
+            setTimeout(function() {
+                if (!allVideosStarted) {
+                    console.log('Videos taking too long to load, starting anyway');
+                    startAllVideos();
+                }
+            }, 5000);
         });
     </script>
 </body>
